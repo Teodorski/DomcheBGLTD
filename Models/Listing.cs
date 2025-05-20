@@ -24,9 +24,6 @@ public class Listing
     public int? Floor { get; set; }
     public int? FloorsTotal { get; set; }
 
-    // new multi-selects
-    public ConstructionType Construction { get; set; }
-    public ListingFeature Features { get; set; }
 
     // contact
     public string? Phone { get; set; }
@@ -39,6 +36,18 @@ public class Listing
     public bool IsApproved { get; set; } = true;
     public bool IsDeleted { get; set; } = false;
 
+    public string Construction { get; set; } = null!;
+    public string FeatureList { get; set; } = "";  // "Furnished,Elevator,…"
+
+    [NotMapped]
+    public List<string> Features
+    {
+        get => string.IsNullOrWhiteSpace(FeatureList)
+            ? new List<string>()
+            : FeatureList.Split(',').ToList();
+
+        set => FeatureList = value == null ? "" : string.Join(',', value);
+    }
     // navigation
     public string OwnerId { get; set; } = null!;
     public ApplicationUser Owner { get; set; } = null!;

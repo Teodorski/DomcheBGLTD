@@ -23,8 +23,8 @@ public class CreateListingVm
     public int? FloorsTotal { get; set; }
 
     // multi-selects
-    public ConstructionType Construction { get; set; }
-    public ListingFeature Features { get; set; }
+    public string Construction { get; set; }
+    public List<string> Features { get; set; } = new List<string>();
 
     // contact
     public string? Phone { get; set; }

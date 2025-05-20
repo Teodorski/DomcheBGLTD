@@ -23,8 +23,8 @@ public class EditListingVm
     public int? FloorsTotal { get; set; }
 
     /* ------------- flags ------------- */
-    public ConstructionType Construction { get; set; }
-    public ListingFeature Features { get; set; }
+    public string Construction { get; set; }
+    public ICollection<string> Features { get; set; }
 
     /* ------------- contact ------------- */
     public string? Phone { get; set; }
@@ -52,7 +52,7 @@ public class EditListingVm
         FloorsTotal = FloorsTotal,
 
         Construction = Construction,
-        Features = Features,
+        Features = Features.ToList(),
 
         Phone = Phone,
         Email = Email,

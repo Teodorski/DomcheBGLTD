@@ -135,29 +135,47 @@
         <div class="row mb-4">
             <div class="col-md-6">
                 <h5>Construction type</h5>
-                <div class="d-flex flex-wrap gap-2">
-                    @foreach (var t in new[] { "Panel", "Brick", "EPK", "Slip Form", "Beam system", "Prefabricated" })
+                <!-- ⌁ Construction type (single choice → radio) -->
+                <div class="col-md-6">
+                    <h5>Construction type</h5>
+
+                    @foreach (var t in new[] { "Panel","Brick","EPK","Slip Form",
+                    "Beam system","Prefabricated" })
                     {
-                        var id = t.Replace(" ", "_");
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="@id">
+                        var id = $"cons_{t.Replace(" ", "_")}";
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input"
+                                   type="radio"
+                                   id="@id"
+                                   name="Construction"
+                                   value="@t"
+                            @(Model.Construction == t ? "checked" : null) />
                             <label class="form-check-label" for="@id">@t</label>
                         </div>
                     }
                 </div>
-            </div>
-            <div class="col-md-6">
-                <h5>Features</h5>
-                <div class="d-flex flex-wrap gap-2">
-                    @foreach (var f in new[] { "Furnished", "Elevator", "Garage included", "Central heating", "Controlled access", "Video surveillance" })
+
+                <!-- ⌁ Features (multi-select → checkboxes) -->
+                <div class="col-md-6">
+                    <h5>Features</h5>
+
+                    @foreach (var f in new[] { "Furnished","Elevator","Garage included",
+                    "Central heating","Controlled access",
+                    "Video surveillance" })
                     {
-                        var id = f.Replace(" ", "_");
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="@id">
+                        var id = $"feat_{f.Replace(" ", "_")}";
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   id="@id"
+                                   name="Features" 
+                                   value="@f"
+                            @(Model.Features?.Contains(f) == true ? "checked" : null) />
                             <label class="form-check-label" for="@id">@f</label>
                         </div>
                     }
                 </div>
+
             </div>
         </div>
 
