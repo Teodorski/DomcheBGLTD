@@ -1,0 +1,11 @@
+﻿@using DomcheBGLTD.Models.ViewModels
+@model ListingCardVm
+
+<div class="card listing">
+    <img src="~/img/@Model.ImageId" class="card-img-top" />
+    <div class="card-body">
+        <h6 class="card-title">@Model.Title</h6>
+        <p class="price-tag">@Model.Price.ToString("F2") лв</p>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="stretched-link"></a>
+    </div>
+</div>

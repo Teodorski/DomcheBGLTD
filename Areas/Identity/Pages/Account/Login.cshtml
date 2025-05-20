@@ -1,0 +1,52 @@
+﻿@page
+@model LoginModel
+@{
+    ViewData["Title"] = "Sign In";
+    Layout = "/Views/Shared/_Layout.cshtml";   /* reuse site layout */
+}
+
+<link rel="stylesheet" href="~/css/register.css" />
+
+<div class="d-flex justify-content-center py-5">
+    <div class="rounded-3 p-5 shadow-lg" style="background:#f3b37d; min-width:420px;">
+        <h4 class="mb-4 text-center fw-bold">Sign in to your account</h4>
+
+        @if (Model.ErrorMessage != null)
+        {
+            <div class="alert alert-danger py-1 text-center">
+                @Model.ErrorMessage
+            </div>
+        }
+
+        <form method="post">
+            <input type="hidden" asp-for="ReturnUrl" />
+
+            <div class="mb-3">
+                <label asp-for="Input.Email" class="form-label">Email address</label>
+                <input asp-for="Input.Email" class="form-control" autocomplete="username" />
+                <span asp-validation-for="Input.Email" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Input.Password" class="form-label">Password</label>
+                <input asp-for="Input.Password" class="form-control" autocomplete="current-password" />
+                <span asp-validation-for="Input.Password" class="text-danger small"></span>
+            </div>
+
+            <div class="form-check mb-4">
+                <input asp-for="Input.RememberMe" class="form-check-input" />
+                <label class="form-check-label" asp-for="Input.RememberMe">Remember me</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Sign in</button>
+
+            <div class="text-center mt-3">
+                <a asp-page="./ForgotPassword">Forgot password?</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

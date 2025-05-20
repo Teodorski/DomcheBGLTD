@@ -1,0 +1,36 @@
+﻿@using DomcheBGLTD.Models.Helpers.Enums
+@model CreateListingVm
+@{
+    ViewData["Title"] = "Create Listing";
+}
+<div class="container-lg py-4">
+    <h4>Create Listing</h4>
+
+    <form asp-action="Create" enctype="multipart/form-data" method="post">
+        @* row 1 – type + year + rent/sale *@
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label asp-for="PropertyType" class="form-label"></label>
+                <select asp-for="PropertyType" asp-items="Html.GetEnumSelectList<PropertyType>()"
+                        class="form-select"></select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Year of construction</label>
+                <input type="number" class="form-control" />
+            </div>
+            <div class="col-md-3 pt-4">
+                <input class="form-check-input" type="radio" asp-for="ListingType" value="1" />
+                <label class="form-check-label me-3">For Rent</label>
+                <input class="form-check-input" type="radio" asp-for="ListingType" value="0" />
+                <label class="form-check-label">For Sale</label>
+            </div>
+        </div>
+
+        @* … replicate the rest of the grid exactly like the screenshot (location, price, size, check-boxes) … *@
+
+        <div class="text-end mt-4">
+            <button type="reset" class="btn btn-accent me-2">Clear form</button>
+            <button type="submit" class="btn btn-primary">Create Listing</button>
+        </div>
+    </form>
+</div>

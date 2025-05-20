@@ -1,0 +1,43 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+<div class="container my-4">
+    @* <input type="text" class="form-control mb-3" placeholder="#EXAMPLE VARNA"/> *@
+    <div class="row">
+        <div class="col-md-7">
+            <img src="~/img/bg-map.png" class="img-fluid rounded shadow-sm"/>
+        </div>
+        <div class="col-md-5 d-flex flex-column gap-4">
+            <div class="content-placeholder h-50"></div>
+            <div class="content-placeholder h-50"></div>
+        </div>
+    </div>
+
+    <!-- clients opinions horizontally scroll -->
+    <section class="my-5">
+        <h5>Clients’ opinions</h5>
+        <div class="d-flex overflow-auto gap-3">
+            <div class="card p-3 flex-shrink-0" style="width: 260px">
+                <p class="fw-semibold">“Found our dream apartment in just 3 days!”</p>
+                <small class="text-muted">
+                    <b>Maria & Petar</b>
+                    <br/>Domche.bg made the process effortless. The filters were spot on, and we loved how easy it was to contact landlords directly.</small>
+            </div>
+            <div class="card p-3 flex-shrink-0" style="width: 260px">
+                <p class="fw-semibold">“Helped us rent out our house fast!”</p>
+                <small class="text-muted"><b>Elena G.</b><br/>We posted our listing on a Friday and had three viewings by Sunday. Excellent exposure and very easy to manage.</small>
+            </div>
+            <div class="card p-3 flex-shrink-0" style="width: 260px">
+                <p class="fw-semibold">“Best rental experience I’ve had in Bulgaria.”</p>
+                <small class="text-muted"><b>Georgi N.</b><br/>Most sites are clunky or outdated. Domche.bg feels modern, fast, and trustworthy. Highly recommend to anyone looking to move.</small>
+            </div>
+            <div class="card p-3 flex-shrink-0" style="width: 260px">
+                <p class="fw-semibold">“Perfect for first-time buyers like us.”</p>
+                <small class="text-muted">
+                    <b>Desislava & Nikolay</b><br/>As a couple buying our first home, we appreciated the clear info and helpful guides. Domche.bg made everything less stressful.
+
+                </small>
+            </div>
+        </div>
+    </section>
+</div>

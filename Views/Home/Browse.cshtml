@@ -1,0 +1,68 @@
+﻿@using DomcheBGLTD.Models.Helpers.Enums
+@model BrowseFilterVm
+@{
+    ViewData["Title"] = "Browse Listings";
+}
+
+<div class="container-lg py-4">
+    <div class="row">
+        <!-- left filter -->
+        <aside class="col-md-4">
+            <form method="get" class="vstack gap-3">
+
+                <!-- Listing type (For Sale / For Rent) -->
+                <div>
+                    <label class="form-label d-block">Listing type</label>
+                    @foreach (ListingType lt in Enum.GetValues<ListingType>())
+                    {
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio"
+                                   name="Listing" id="lt_@lt" value="@lt"
+                                   checked="@(Model.Listing == lt)" />
+                            <label class="form-check-label" for="lt_@lt">@lt</label>
+                        </div>
+                    }
+                </div>
+
+                <!-- Property type multi-select -->
+                <div>
+                    <label class="form-label d-block mt-2">Property type</label>
+                    <div class="d-flex flex-wrap gap-2">
+                        @foreach (PropertyType p in Enum.GetValues<PropertyType>())
+                        {
+                            <div class="form-check me-2">
+                                <input class="form-check-input" type="checkbox"
+                                       name="Property" value="@p" id="pt_@p"
+                                       checked="@(Model.Property.Contains(p))" />
+                                <label class="form-check-label" for="pt_@p">@p</label>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- City dropdown, price range … (unchanged) -->
+
+                <button class="btn btn-primary w-100">Search</button>
+            </form>
+        </aside>
+
+        <!-- right results -->
+        <section class="col-md-8">
+            <div class="row">
+                @if (Model.Results?.Any() == true)
+                {
+                    @foreach (var card in Model.Results)
+                    {
+                        <div class="col-md-6 mb-4">
+                            @await Html.PartialAsync("_ListingCard", card)
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted">No listings match your filters.</p>
+                }
+            </div>
+        </section>
+    </div>
+</div>

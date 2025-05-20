@@ -1,0 +1,316 @@
+﻿@using DomcheBGLTD.Models.ViewModels
+@using DomcheBGLTD.Models.Helpers.Enums
+@model CreateListingVm
+@{
+    ViewData["Title"] = "Edit Listing";
+    int listingId = (int)ViewBag.ListingId;
+    int[] existing = ViewBag.ExistingIds as int[] ?? Array.Empty<int>();
+}
+
+<h4 class="mt-4 ms-1">Edit listing</h4>
+<hr />
+
+<div class="container-fluid pb-4">
+    <form asp-action="Edit" asp-route-id="@listingId"
+          enctype="multipart/form-data" method="post" class="needs-validation" novalidate>
+        @Html.AntiForgeryToken()
+        <!-- ─────────── TOP ROW ─────────── -->
+        <div class="row g-4">
+            <!-- left chunk (property fields) -->
+            <div class="col-lg-8">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="Title" class="form-label">Title</label>
+                        <input asp-for="Title" class="form-control" maxlength="120" required />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Description" class="form-label">Description</label>
+                        <textarea asp-for="Description" rows="3" class="form-control" maxlength="2000" required></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="PropertyType" class="form-label">Property type</label>
+                        <select asp-for="PropertyType" asp-items="Html.GetEnumSelectList<PropertyType>()"
+                                class="form-select" required></select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Year of construction</label>
+                        <input type="number" min="1900" max="@DateTime.Now.Year" class="form-control">
+                    </div>
+                    <div class="col-md-4 pt-2">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" asp-for="ListingType" value="ForSale" id="sale">
+                            <label class="form-check-label" for="sale">For SALE</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" asp-for="ListingType" value="ForRent" id="rent" checked>
+                            <label class="form-check-label" for="rent">For RENT</label>
+                        </div>
+                        <span asp-validation-for="ListingType" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- right chunk (preview + upload button) -->
+            <div class="col-lg-4">
+                <h6 class="mb-2">Images</h6>
+
+                <div id="previewBox" class="border rounded position-relative bg-light"
+                     style="height:180px; overflow:hidden; cursor:pointer">
+                    <img id="previewImg" class="w-100 h-100 @(existing.Any() ? "" : "d-none")"
+                         style="object-fit:cover"
+                         src="@(existing.Any() ? $"/img/{existing[0]}" : "")" />
+
+                    <div id="placeholder" class="w-100 h-100 d-flex flex-column justify-content-center
+                                  align-items-center text-muted small @(existing.Any()?"d-none":"")">
+                        No images yet
+                    </div>
+
+                    <button type="button" class="preview-nav left" onclick="showPrev()">&#x276E;</button>
+                    <button type="button" class="preview-nav right" onclick="showNext()">&#x276F;</button>
+                </div>
+                
+                <input asp-for="Images" id="imgInput" type="file" multiple accept="image/*" class="d-none" />
+
+                <label for="imgInput" class="btn btn-primary mb-0">Add images</label>
+                <button type="button" id="btnClear" class="btn btn-outline-secondary mb-0">Clear images</button>
+                <span id="imgCount" class="text-muted ms-2 small">
+                    @(existing.Length == 0 ? "No files selected" :
+                        existing.Length == 1 ? "1 existing image" :
+                        $"{existing.Length} existing images")
+                </span>
+                <span asp-validation-for="Images" class="text-danger"></span>
+            </div>
+        </div>
+
+        <hr class="my-4" />
+
+        <!-- LOCATION -->
+        <h5>Location</h5>
+        <div class="row g-3 mb-3">
+            <div class="col-md-3">
+                <label asp-for="Province" class="form-label">Province</label>
+                <select asp-for="Province" class="form-select">
+                    <option value="">Choose…</option>
+                    @foreach (var prov in new[] { "Sofia", "Varna", "Plovdiv" })
+                    {
+                        <option value="@prov">@prov</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="City" class="form-label">City / Town</label>
+                <input asp-for="City" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Address line 1</label>
+                <input class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Address line 2</label>
+                <input class="form-control" />
+            </div>
+        </div>
+
+        <!-- PRICE & SIZE -->
+        <h5>Price & Size</h5>
+        <div class="row g-3 mb-3">
+            <div class="col-md-2">
+                <label asp-for="Price" class="form-label">Total price</label>
+                <input asp-for="Price" class="form-control form-control-sm" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Currency</label>
+                <select class="form-select form-select-sm"><option>EUR</option><option>BGN</option></select>
+            </div>
+            <div class="col-md-2">
+                <label asp-for="AreaM2" class="form-label">Area m²</label>
+                <input asp-for="AreaM2" class="form-control form-control-sm" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Floor</label>
+                <input class="form-control form-control-sm" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Floors (if multi)</label>
+                <input class="form-control form-control-sm" />
+            </div>
+        </div>
+
+        <!-- CONSTRUCTION & FEATURES -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h5>Construction type</h5>
+                <div class="d-flex flex-wrap gap-2">
+                    @foreach (var t in new[] { "Panel", "Brick", "EPK", "Slip Form", "Beam system", "Prefabricated" })
+                    {
+                        var id = t.Replace(" ", "_");
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="@id">
+                            <label class="form-check-label" for="@id">@t</label>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h5>Features</h5>
+                <div class="d-flex flex-wrap gap-2">
+                    @foreach (var f in new[] { "Furnished", "Elevator", "Garage included", "Central heating", "Controlled access", "Video surveillance" })
+                    {
+                        var id = f.Replace(" ", "_");
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="@id">
+                            <label class="form-check-label" for="@id">@f</label>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTACT & NOTES -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <label class="form-label">Phone number</label>
+                <input class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Email address</label>
+                <input class="form-control" />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Additional information</label>
+                <textarea class="form-control" rows="3"></textarea>
+            </div>
+        </div>
+        <input type="hidden" name="removeExisting" id="removeExisting" value="false" />
+
+
+        <div class="text-end">
+            <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+    </form>
+</div>
+
+<!-- MODAL ZOOM -->
+<div class="modal fade" id="imgModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-dark border-0">
+            <button type="button" class="btn-close btn-close-white ms-auto me-1 mt-1"
+                    data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-body p-0 position-relative">
+                <img id="modalImg" class="w-100" style="max-height:80vh; object-fit:contain">
+                <button class="preview-nav left" onclick="showPrev()"></button>
+                <button class="preview-nav right" onclick="showNext()"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <style>
+        .preview-nav {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 40px;
+            background: rgba(0,0,0,.35);
+            color: #fff;
+            border: none;
+            font-size: 1.5rem;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .preview-nav.left {
+                left: 0;
+            }
+
+            .preview-nav.right {
+                right: 0;
+            }
+
+        #previewBox:hover .preview-nav,
+        #imgModal .preview-nav {
+            display: flex;
+        }
+    </style>
+
+    <script>
+        let previews = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+                           existing.Select(id => $"/img/{id}")));
+        let idx = 0;
+        const fileInput = document.getElementById('imgInput'),
+        previewImg = document.getElementById('previewImg'),
+        placeholder = document.getElementById('placeholder'),
+        imgCount = document.getElementById('imgCount'),
+        modal = new bootstrap.Modal('#imgModal'),
+        modalImg = document.getElementById('modalImg');
+
+                fileInput.addEventListener('change', () => {
+                    const files = fileInput.files;
+                    imgCount.textContent = files.length === 0 ? 'No files selected'
+                                       : files.length === 1 ? '1 file selected'
+                                       : `${files.length} files selected`;
+                    loadPreviews(files);
+                });
+
+                document.getElementById('previewBox')
+                        .addEventListener('click', () => {
+                            if(previews.length){ modalImg.src = previews[idx]; modal.show(); }
+                        });
+
+                function loadPreviews(fileList){
+                    previews = []; idx = 0;
+                    if(fileList.length === 0){
+                        previewImg.classList.add('d-none');
+                        placeholder.classList.remove('d-none');
+                        return;
+                    }
+                    [...fileList].forEach((file,i)=>{
+                        const r = new FileReader();
+                        r.onload = e => {
+                            previews[i] = e.target.result;
+                            if(i===0) show(0);
+                        };
+                        r.readAsDataURL(file);
+                    });
+                }
+
+                function show(n){
+                    if(!previews.length) return;
+                    idx = (n + previews.length) % previews.length;
+                    previewImg.src = previews[idx];
+                    previewImg.classList.remove('d-none');
+                    placeholder.classList.add('d-none');
+                    if(modal._isShown) modalImg.src = previews[idx];
+                }
+                function showNext(){ show(idx+1); }
+                function showPrev(){ show(idx-1); }
+
+        document.getElementById('btnClear').addEventListener('click', () => clearImages());
+
+        function clearImages(){
+            // 1. wipe file input
+            fileInput.value = "";
+
+            // 2. wipe previews array
+            previews = [];
+            idx = 0;
+
+            // 3. reset UI
+            previewImg.classList.add('d-none');
+            placeholder.classList.remove('d-none');
+            imgCount.textContent = 'No files selected';
+
+            // 4. if we're in EDIT mode, mark existing DB images for removal
+            const flag = document.getElementById('removeExisting');
+            if (flag) flag.value = "true";
+        }
+
+    </script>
+}

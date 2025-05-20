@@ -1,0 +1,30 @@
+﻿@*
+    domche.bg – Homepage
+    Recreates the two big CTA tiles + e-mail subscribe hero
+*@
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="container py-5 text-center">
+
+    <!-- row with two CTA tiles -->
+    <div class="d-flex flex-column flex-md-row gap-5 justify-content-center">
+
+        <!-- FOR SALE -->
+        <a class="cta-tile"
+           asp-controller="Listings"
+           asp-action="Browse"
+           asp-route-Listing="ForSale">
+            FOR SALE
+        </a>
+
+        <!-- FOR RENT -->
+        <a class="cta-tile"
+           asp-controller="Listings"
+           asp-action="Browse"
+           asp-route-Listing="ForRent">
+            FOR RENT
+        </a>
+    </div>
+</div>
