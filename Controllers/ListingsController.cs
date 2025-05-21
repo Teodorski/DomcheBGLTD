@@ -1,5 +1,5 @@
 ﻿using DomcheBGLTD.Data;
-using DomcheBGLTD.Models;
+using DomcheBGLTD.Models.Entities;
 using DomcheBGLTD.Models.Helpers;
 using DomcheBGLTD.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -24,11 +24,11 @@ namespace DomcheBGLTD.Controllers
             if (f.Listing is not null)
                 q = q.Where(l => l.ListingType == f.Listing);
 
-            if (f.Property.Any())
-                q = q.Where(l => f.Property.Contains(l.PropertyType));
-            if (!string.IsNullOrWhiteSpace(f.City)) q = q.Where(l => l.City == f.City);
-            if (f.MinPrice is not null) q = q.Where(l => l.Price >= f.MinPrice);
-            if (f.MaxPrice is not null) q = q.Where(l => l.Price <= f.MaxPrice);
+            //if (f.Property.Any())
+            //    q = q.Where(l => f.Property.Contains(l.PropertyType));
+            //if (!string.IsNullOrWhiteSpace(f.City)) q = q.Where(l => l.City == f.City);
+            //if (f.MinPrice is not null) q = q.Where(l => l.Price >= f.MinPrice);
+            //if (f.MaxPrice is not null) q = q.Where(l => l.Price <= f.MaxPrice);
 
             f.Results = q
                 .AsNoTracking()
@@ -58,11 +58,11 @@ namespace DomcheBGLTD.Controllers
         [Authorize, HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateListingVm vm)
         {
-            if (!ModelState.IsValid) return View(vm);
+            //if (!ModelState.IsValid) return View(vm);
 
-            var entity = vm.ToEntity(User.GetUserId());   // extension method for current user id
-            _ctx.Add(entity);
-            await _ctx.SaveChangesAsync();
+            //var entity = vm.ToEntity(User.GetUserId());   // extension method for current user id
+            //_ctx.Add(entity);
+            //await _ctx.SaveChangesAsync();
             return RedirectToAction("My", "ManageListings");
         }
 

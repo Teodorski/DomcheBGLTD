@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using DomcheBGLTD.Models.Entities;
 using DomcheBGLTD.Services;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DomcheBGLTD.Controllers;
 
@@ -34,72 +36,91 @@ public class ManageListingsController : Controller
     }
 
     /* ----------  GET: Create form ---------- */
-    [HttpGet]                            // or omit – GET is default
-    public IActionResult Create()
+    [HttpGet]
+    public async Task<IActionResult> Create()
     {
-        return View(new CreateListingVm());
+        var vm = new CreateListingVm();
+        await PopulateVmLookups(vm);
+        return View(vm);
     }
-    
+
     /* ----------  POST: handle form ---------- */
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateListingVm vm)
     {
-        if (!ModelState.IsValid) return View(vm);
+        // if invalid, re-populate lookup lists and return
+        if (!ModelState.IsValid)
+        {
+            await PopulateVmLookups(vm);
+            return View(vm);
+        }
 
+        // 1) get current user
         var ownerId = User.GetUserId();
-        var entity = vm.ToEntity(ownerId);
 
-        const long limit = 5 * 1024 * 1024;
+        // 2) load the selected FeatureType entities
+        var selectedFeatures = await _ctx.FeatureTypes
+            .Where(ft => vm.Features.Contains(ft.Id))
+            .ToListAsync();
+
+        // 3) map VM → Listing (including Features)
+        var listing = vm.ToEntity(ownerId, selectedFeatures);
+
+        // 4) process uploaded images
         foreach (var file in vm.Images ?? Enumerable.Empty<IFormFile>())
         {
-            if (file.Length is 0 or > limit)
+            if (file.Length is 0 or > FileLimit)
             {
-                ModelState.AddModelError("", $"Image {file.FileName} is empty or too large.");
+                ModelState.AddModelError("", $"Image \"{file.FileName}\" is empty or exceeds 5 MB.");
+                await PopulateVmLookups(vm);
                 return View(vm);
             }
 
             await using var ms = new MemoryStream();
             await file.CopyToAsync(ms);
-            entity.Images.Add(new ListingImage
+
+            listing.Images.Add(new ListingImage
             {
                 Data = ms.ToArray(),
                 ContentType = file.ContentType,
-                Order = entity.Images.Count
+                Order = listing.Images.Count
             });
         }
 
-        _ctx.Add(entity);
+        await _ctx.Listings.AddAsync(listing);
         await _ctx.SaveChangesAsync();
-        return RedirectToAction(nameof(My));
+        return RedirectToAction(nameof(My));  // or wherever you want
     }
 
-    /* ----------  GET: Edit  ---------- */
-    [HttpGet]
-    public async Task<IActionResult> Edit(int id)
+    /// <summary>
+    /// Populates all the <see cref="SelectListItem"/> collections on the VM.
+    /// </summary>
+    private async Task PopulateVmLookups(CreateListingVm vm)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var listing = await _ctx.Listings
-                                .Include(l => l.Images)
-                                .FirstOrDefaultAsync(l => l.Id == id && l.OwnerId == userId);
+        vm.PropertyTypes = await _ctx.PropertyTypes
+            .OrderBy(pt => pt.Name)
+            .Select(pt => new SelectListItem(pt.Name, pt.Id.ToString()))
+            .ToListAsync();
 
-        if (listing == null) return NotFound();
+        vm.Cities = await _ctx.Cities
+            .OrderBy(c => c.Name)
+            .Select(c => new SelectListItem(c.Name, c.Id.ToString()))
+            .ToListAsync();
 
-        var vm = new CreateListingVm
-        {
-            Title = listing.Title,
-            Description = listing.Description,
-            ListingType = listing.ListingType,
-            PropertyType = listing.PropertyType,
-            Price = listing.Price,
-            AreaM2 = listing.AreaM2,
-            Province = listing.Province,
-            City = listing.City
-        };
+        vm.Currencies = await _ctx.Currencies
+            .OrderBy(cu => cu.Code)
+            .Select(cu => new SelectListItem(cu.Code, cu.Id.ToString()))
+            .ToListAsync();
 
-        ViewBag.ListingId = id;
-        ViewBag.ExistingIds = listing.Images.OrderBy(i => i.Order)
-                                            .Select(i => i.Id).ToArray();
-        return View(vm);                             // Views/ManageListings/Edit.cshtml
+        vm.ConstructionTypes = await _ctx.ConstructionTypes
+            .OrderBy(ct => ct.Name)
+            .Select(ct => new SelectListItem(ct.Name, ct.Id.ToString()))
+            .ToListAsync();
+
+        vm.AvailableFeatures = await _ctx.FeatureTypes
+            .OrderBy(ft => ft.Name)
+            .Select(ft => new SelectListItem(ft.Name, ft.Id.ToString()))
+            .ToListAsync();
     }
 
     /* ----------  POST: Edit  ---------- */
@@ -119,7 +140,6 @@ public class ManageListingsController : Controller
             return View(vm);
         }
 
-        listing.UpdateFrom(vm);
         listing.UpdatedUtc = DateTime.UtcNow;
 
         bool wipe = Request.Form["removeExisting"] == "true";

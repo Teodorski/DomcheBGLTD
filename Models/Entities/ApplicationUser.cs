@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace DomcheBGLTD.Models;
+namespace DomcheBGLTD.Models.Entities;
 
 public class ApplicationUser : IdentityUser
 {

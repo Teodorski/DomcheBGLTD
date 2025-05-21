@@ -1,4 +1,6 @@
-﻿namespace DomcheBGLTD.Models.ViewModels;
+﻿using DomcheBGLTD.Models.Entities;
+
+namespace DomcheBGLTD.Models.ViewModels;
 
 public static class ListingCardVmMapper
 {

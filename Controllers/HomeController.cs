@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using DomcheBGLTD.Models;
+using DomcheBGLTD.Models.Entities;
 
 namespace DomcheBGLTD.Controllers
 {

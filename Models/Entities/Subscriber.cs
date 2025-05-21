@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DomcheBGLTD.Models;
+namespace DomcheBGLTD.Models.Entities;
 
 public class Subscriber
 {

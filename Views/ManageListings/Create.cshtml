@@ -9,9 +9,7 @@
 <hr />
 
 <div class="container-fluid pb-4">
-    <form asp-action="Create" enctype="multipart/form-data" method="post" class="needs-validation" novalidate>
-        @Html.AntiForgeryToken()
-
+    <form asp-action="Create" enctype="multipart/form-data" method="post" class="row g-3" novalidate>
         <!-- ─────────── TOP ROW ─────────── -->
         <div class="row g-4">
             <!-- left chunk (property fields) -->
@@ -29,13 +27,15 @@
                     </div>
 
                     <div class="col-md-4">
-                        <label asp-for="PropertyType" class="form-label">Property type</label>
-                        <select asp-for="PropertyType" asp-items="Html.GetEnumSelectList<PropertyType>()"
-                                class="form-select" required></select>
+                        <label asp-for="PropertyTypeId" class="form-label">Property type</label>
+                        <select asp-for="PropertyTypeId" asp-items="@Model.PropertyTypes"
+                                class="form-select" required>
+                            <option value="">— select property type —</option>
+                        </select>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Year of construction</label>
-                        <input type="number" min="1900" max="@DateTime.Now.Year" class="form-control">
+                        <label asp-for="YearBuilt" class="form-label">Year of construction</label>
+                        <input asp-for="YearBuilt" type="number" min="1900" max="@DateTime.Now.Year" class="form-control">
                     </div>
                     <div class="col-md-4 pt-2">
                         <div class="form-check form-check-inline">
@@ -83,26 +83,19 @@
         <h5>Location</h5>
         <div class="row g-3 mb-3">
             <div class="col-md-3">
-                <label asp-for="Province" class="form-label">Province</label>
-                <select asp-for="Province" class="form-select">
-                    <option value="">Choose…</option>
-                    @foreach (var prov in new[] { "Sofia", "Varna", "Plovdiv" })
-                    {
-                        <option value="@prov">@prov</option>
-                    }
+                <label asp-for="CityId" class="form-label">City / Town / Village</label>
+                <select asp-for="CityId" asp-items="@Model.Cities"
+                        class="form-select" required>
+                    <option value="">— select city / town / village —</option>
                 </select>
             </div>
             <div class="col-md-3">
-                <label asp-for="City" class="form-label">City / Town</label>
-                <input asp-for="City" class="form-control" />
+                <label asp-for="Address1" class="form-label">Address line 1</label>
+                <input asp-for=" Address1" class="form-control" />
             </div>
             <div class="col-md-3">
-                <label class="form-label">Address line 1</label>
-                <input class="form-control" />
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Address line 2</label>
-                <input class="form-control" />
+                <label asp-for="Address2" class="form-label">Address line 2</label>
+                <input asp-for="Address2" class="form-control" />
             </div>
         </div>
 
@@ -114,64 +107,68 @@
                 <input asp-for="Price" class="form-control form-control-sm" />
             </div>
             <div class="col-md-2">
-                <label class="form-label">Currency</label>
-                <select class="form-select form-select-sm"><option>EUR</option><option>BGN</option></select>
+                <label asp-for="CurrencyId" class="form-label">Currency</label>
+                <select asp-for="CurrencyId" asp-items="@Model.Currencies"
+                        class="form-select" required>
+                    <option value="">— select currency —</option>
+                </select>
             </div>
             <div class="col-md-2">
                 <label asp-for="AreaM2" class="form-label">Area m²</label>
                 <input asp-for="AreaM2" class="form-control form-control-sm" />
             </div>
             <div class="col-md-2">
-                <label class="form-label">Floor</label>
-                <input class="form-control form-control-sm" />
+                <label asp-for="Floor" class="form-label">Floor</label>
+                <input asp-for="Floor" class="form-control form-control-sm" />
             </div>
             <div class="col-md-2">
-                <label class="form-label">Floors (if multi)</label>
-                <input class="form-control form-control-sm" />
+                <label asp-for="FloorsTotal" class="form-label">Floors (if multi)</label>
+                <input asp-for="FloorsTotal" class="form-control form-control-sm" />
             </div>
         </div>
 
         <!-- CONSTRUCTION & FEATURES -->
         <div class="row mb-4">
             <div class="col-md-6">
-                <h5>Construction type</h5>
-                <!-- ⌁ Construction type (single choice → radio) -->
+                <!-- Construction type (single choice → radio) -->
                 <div class="col-md-6">
                     <h5>Construction type</h5>
 
-                    @foreach (var t in new[] { "Panel","Brick","EPK","Slip Form",
-                    "Beam system","Prefabricated" })
+                    @foreach(var t in Model.ConstructionTypes)
                     {
-                        var id = $"cons_{t.Replace(" ", "_")}";
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input"
+                            <input asp-for="ConstructionTypeId"
+                                   class="form-check-input"
                                    type="radio"
-                                   id="@id"
-                                   name="Construction"
-                                   value="@t"
-                            @(Model.Construction == t ? "checked" : null) />
-                            <label class="form-check-label" for="@id">@t</label>
+                                   id="construction_@t.Value"
+                                   value="@t.Value" />
+                            <label class="form-check-label"
+                                   for="construction_@t.Value">
+                                @t.Text
+                            </label>
                         </div>
                     }
                 </div>
 
-                <!-- ⌁ Features (multi-select → checkboxes) -->
+                <!-- Features (multi-select → checkboxes) -->
                 <div class="col-md-6">
                     <h5>Features</h5>
 
-                    @foreach (var f in new[] { "Furnished","Elevator","Garage included",
-                    "Central heating","Controlled access",
-                    "Video surveillance" })
+                    @foreach (var f in Model.AvailableFeatures)
                     {
-                        var id = $"feat_{f.Replace(" ", "_")}";
+                        var id = $"feat_{f.Value}";
                         <div class="form-check form-check-inline">
                             <input class="form-check-input"
                                    type="checkbox"
                                    id="@id"
-                                   name="Features" 
-                                   value="@f"
-                            @(Model.Features?.Contains(f) == true ? "checked" : null) />
-                            <label class="form-check-label" for="@id">@f</label>
+                                   name="Features"
+                                   value="@f.Value"
+                                   @(Model.Features?.Contains(int.Parse(f.Value)) == true 
+                                       ? "checked" 
+                                       : "") />
+                            <label class="form-check-label" for="@id">
+                                @f.Text
+                            </label>
                         </div>
                     }
                 </div>
@@ -182,23 +179,24 @@
         <!-- CONTACT & NOTES -->
         <div class="row mb-4">
             <div class="col-md-3">
-                <label class="form-label">Phone number</label>
-                <input class="form-control" />
+                <label asp-for="Phone" class="form-label">Phone number</label>
+                <input asp-for="Phone" class="form-control" />
             </div>
             <div class="col-md-3">
-                <label class="form-label">Email address</label>
-                <input class="form-control" />
+                <label asp-for="Email" class="form-label">Email address</label>
+                <input asp-for="Email" class="form-control" />
             </div>
             <div class="col-md-6">
-                <label class="form-label">Additional information</label>
-                <textarea class="form-control" rows="3"></textarea>
+                <label asp-for="AdditionalInformation" class="form-label">Additional information</label>
+                <textarea asp-for="AdditionalInformation" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="AdditionalInformation" class="text-danger"></span>
             </div>
         </div>
         <input type="hidden" name="removeExisting" id="removeExisting" value="false" />
 
         <div class="text-end">
             <button type="reset" class="btn btn-secondary me-2">Clear form</button>
-            <button type="submit" class="btn btn-primary">Create Listing</button>
+            <button asp-action="Create" type="submit" class="btn btn-primary">Create Listing</button>
         </div>
     </form>
 </div>

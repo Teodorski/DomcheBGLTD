@@ -1,65 +1,91 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using DomcheBGLTD.Models.Entities;
 using DomcheBGLTD.Models.Helpers.Enums;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DomcheBGLTD.Models.ViewModels;
 public class CreateListingVm
 {
-    [Required, StringLength(120)] public string Title { get; set; }
-    [Required, StringLength(2000)] public string Description { get; set; }
+    [Required, StringLength(120)]
+    public string Title { get; set; }
 
-    [Required] public ListingType ListingType { get; set; }
-    [Required] public PropertyType PropertyType { get; set; }
-    public decimal? Price { get; set; }
-    public string Currency { get; set; } = "EUR";
+    [Required, StringLength(2000)]
+    public string Description { get; set; }
+
+    [Required]
+    public ListingType ListingType { get; set; }
+
+    [Required]
+    public int PropertyTypeId { get; set; }
+
+    [Required]
+    public decimal Price { get; set; }
+    public int CurrencyId { get; set; }
     public decimal? AreaM2 { get; set; }
     public int? YearBuilt { get; set; }
 
     // location
-    public string? Province { get; set; }
-    public string? City { get; set; }
-    public string? Address1 { get; set; }
+    [Required]
+    public int CityId { get; set; }
+
+    [Required]
+    public string Address1 { get; set; }
     public string? Address2 { get; set; }
     public int? Floor { get; set; }
     public int? FloorsTotal { get; set; }
 
     // multi-selects
-    public string Construction { get; set; }
-    public List<string> Features { get; set; } = new List<string>();
+    public int ConstructionTypeId { get; set; }
+    public List<int> Features { get; set; } = new List<int>();
+    public IEnumerable<SelectListItem> PropertyTypes { get; set; } = [];
+    public IEnumerable<SelectListItem> Cities { get; set; } = [];
+    public IEnumerable<SelectListItem> Currencies { get; set; } = [];
+    public IEnumerable<SelectListItem> ConstructionTypes { get; set; } = [];
+    public IEnumerable<SelectListItem> AvailableFeatures { get; set; } = [];
+
 
     // contact
-    public string? Phone { get; set; }
-    public string? Email { get; set; }
-    public string? ExtraInfo { get; set; }
+    [Required]
+    public string Phone { get; set; }
+    [Required]
+    public string Email { get; set; }
+    [Required, StringLength(2000)]
+    public string? AdditionalInformation { get; set; }
 
     // images
     public List<IFormFile> Images { get; set; } = new();
 
-    /* helper: VM -> entity */
-    public Listing ToEntity(string ownerId) => new()
+    public Listing ToEntity(string ownerId, List<FeatureType> featureTypes)
     {
-        Title = Title,
-        Description = Description,
-        ListingType = ListingType,
-        PropertyType = PropertyType,
-        Price = Price ?? 0,
-        Currency = Currency,
-        AreaM2 = AreaM2,
-        YearBuilt = YearBuilt,
+        var listing = new Listing
+        {
+            Title = Title,
+            Description = Description,
+            ListingType = ListingType,
+            PropertyTypeId = PropertyTypeId,
+            Price = Price,
+            CurrencyId = CurrencyId,
+            AreaM2 = AreaM2,
+            YearBuilt = YearBuilt,
 
-        Province = Province,
-        City = City,
-        Address1 = Address1,
-        Address2 = Address2,
-        Floor = Floor,
-        FloorsTotal = FloorsTotal,
+            CityId = CityId,
+            Address1 = Address1,
+            Address2 = Address2,
+            Floor = Floor,
+            FloorsTotal = FloorsTotal,
 
-        Construction = Construction,
-        Features = Features,
+            ConstructionTypeId = ConstructionTypeId,
 
-        Phone = Phone,
-        Email = Email,
-        ExtraInfo = ExtraInfo,
+            Phone = Phone,
+            Email = Email,
+            ExtraInfo = AdditionalInformation,
 
-        OwnerId = ownerId
-    };
+            OwnerId = ownerId,
+
+            // skip-nav: attach the FeatureType entities you looked up in the controller
+            Features = featureTypes
+        };
+
+        return listing;
+    }
 }

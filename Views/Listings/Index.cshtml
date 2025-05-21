@@ -1,4 +1,5 @@
-﻿@model IEnumerable<DomcheBGLTD.Models.Listing>
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model IEnumerable<DomcheBGLTD.Models.Entities.Listing>
 
 @{
     ViewData["Title"] = "Index";
@@ -30,9 +31,6 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.PropertyType)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Province)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.City)
@@ -75,9 +73,6 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.PropertyType)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Province)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.City)

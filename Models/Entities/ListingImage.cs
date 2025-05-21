@@ -1,10 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DomcheBGLTD.Models;
+namespace DomcheBGLTD.Models.Entities;
 
 public class ListingImage
 {
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [Required]
     public int Id { get; set; }
     public int ListingId { get; set; }
 
@@ -17,4 +20,6 @@ public class ListingImage
     public string ContentType { get; set; } = default!;   // "image/jpeg", …
 
     public int Order { get; set; }
+
+    public virtual Listing? Listing { get; set; } = default!;
 }
