@@ -163,7 +163,7 @@
                                    id="@id"
                                    name="Features"
                                    value="@f.Value"
-                                   @(Model.Features?.Contains(int.Parse(f.Value)) == true 
+                                   @(Model.SelectedFeatures?.Contains(int.Parse(f.Value)) == true 
                                        ? "checked" 
                                        : "") />
                             <label class="form-check-label" for="@id">

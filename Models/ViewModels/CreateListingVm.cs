@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using DomcheBGLTD.Models.DTOs;
 using DomcheBGLTD.Models.Entities;
 using DomcheBGLTD.Models.Helpers.Enums;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -36,13 +37,14 @@ public class CreateListingVm
 
     // multi-selects
     public int ConstructionTypeId { get; set; }
-    public List<int> Features { get; set; } = new List<int>();
+    public List<int> SelectedFeatures { get; set; } = [];
     public IEnumerable<SelectListItem> PropertyTypes { get; set; } = [];
     public IEnumerable<SelectListItem> Cities { get; set; } = [];
     public IEnumerable<SelectListItem> Currencies { get; set; } = [];
     public IEnumerable<SelectListItem> ConstructionTypes { get; set; } = [];
     public IEnumerable<SelectListItem> AvailableFeatures { get; set; } = [];
-
+    public List<ListingImageDto> ExistingImages { get; set; } = [];
+    public List<int> RemoveImageIds { get; set; } = [];
 
     // contact
     [Required]
