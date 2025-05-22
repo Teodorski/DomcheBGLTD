@@ -197,28 +197,29 @@ public class ManageListingsController : Controller
         {
             return NotFound(vm);
         }
+        listingEntity.Title = vm.Title;
+        listingEntity.Description = vm.Description;
+        listingEntity.Price = vm.Price;
 
-        var listing = vm.ToEntity(ownerId, selectedFeatures);
-
-        listing.Features.Clear();
+        listingEntity.Features.Clear();
         foreach (var feature in selectedFeatures)
         {
-            listing.Features.Add(feature);
+            listingEntity.Features.Add(feature);
         }
 
         if (vm.RemoveImageIds?.Any() == true)
         {
             vm.RemoveImageIds.ForEach(id =>
             {
-                var image = listing.Images.FirstOrDefault(i => i.Id == id);
+                var image = listingEntity.Images.FirstOrDefault(i => i.Id == id);
                 if (image != null)
                 {
-                    listing.Images.Remove(image);
+                    listingEntity.Images.Remove(image);
                 }
             });
         }
 
-        listing.Images.Clear();
+        listingEntity.Images.Clear();
         // 4) process uploaded images
         foreach (var file in vm.Images ?? Enumerable.Empty<IFormFile>())
         {
@@ -232,15 +233,15 @@ public class ManageListingsController : Controller
             await using var ms = new MemoryStream();
             await file.CopyToAsync(ms);
 
-            listing.Images.Add(new ListingImage
+            listingEntity.Images.Add(new ListingImage
             {
                 Data = ms.ToArray(),
                 ContentType = file.ContentType,
-                Order = listing.Images.Count
+                Order = listingEntity.Images.Count
             });
         }
 
-        _ctx.Listings.Update(listing);
+        _ctx.Listings.Update(listingEntity);
         await _ctx.SaveChangesAsync();
         return RedirectToAction(nameof(My));
     }
