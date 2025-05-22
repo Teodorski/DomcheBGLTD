@@ -25,22 +25,27 @@
                 </div>
 
                 <!-- Property type multi-select -->
-                <div>
-                    <label class="form-label d-block mt-2">Property type</label>
-                    <div class="d-flex flex-wrap gap-2">
-                        @foreach (PropertyType p in Enum.GetValues<PropertyType>())
-                        {
-                            <div class="form-check me-2">
-                                <input class="form-check-input" type="checkbox"
-                                       name="Property" value="@p" id="pt_@p"
-                                       checked="@(Model.Property.Contains(p))" />
-                                <label class="form-check-label" for="pt_@p">@p</label>
-                            </div>
-                        }
-                    </div>
-                </div>
+                <div class="col-md-5">
+                    <h5>Property Types</h5>
 
-                <!-- City dropdown, price range … (unchanged) -->
+                    @foreach (var f in Model.PropertyTypes)
+                    {
+                        var id = $"prop_{f.Value}";
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   id="@id"
+                                   name="PropertyTypes"
+                                   value="@f.Value"
+                            @(Model.SelectedPropertyTypes?.Contains(int.Parse(f.Value)) == true
+                                ? "checked"
+                                : "") />
+                            <label class="form-check-label" for="@id">
+                                @f.Text
+                            </label>
+                        </div>
+                    }
+                </div>
 
                 <button class="btn btn-primary w-100">Search</button>
             </form>

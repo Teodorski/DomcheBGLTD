@@ -8,42 +8,129 @@
     <div class="row">
         <!-- left filter -->
         <aside class="col-md-4">
-            <form method="get" class="vstack gap-3">
-
+            <form asp-action="Browse" method="post" class="row g-3" novalidate>
                 <!-- Listing type (For Sale / For Rent) -->
-                <div>
-                    <label class="form-label d-block">Listing type</label>
-                    @foreach (ListingType lt in Enum.GetValues<ListingType>())
-                    {
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio"
-                                   name="Listing" id="lt_@lt" value="@lt"
-                                   checked="@(Model.Listing == lt)" />
-                            <label class="form-check-label" for="lt_@lt">@lt</label>
-                        </div>
-                    }
-                </div>
-
-                <!-- Property type multi-select -->
-                <div>
-                    <label class="form-label d-block mt-2">Property type</label>
-                    <div class="d-flex flex-wrap gap-2">
-                        @foreach (PropertyType p in Enum.GetValues<PropertyType>())
+                <div class="mb-3">
+                    <label class="form-label fw-bold">For rent/ For sale</label>
+                    <div>
+                        @foreach (ListingType lt in Enum.GetValues<ListingType>())
                         {
-                            <div class="form-check me-2">
-                                <input class="form-check-input" type="checkbox"
-                                       name="Property" value="@p" id="pt_@p"
-                                       checked="@(Model.Property.Contains(p))" />
-                                <label class="form-check-label" for="pt_@p">@p</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio"
+                                       name="Listing" id="lt_@lt" value="@lt"
+                                       checked="@(Model.Listing == lt)" />
+                                <label class="form-check-label" for="lt_@lt">@lt</label>
                             </div>
                         }
                     </div>
                 </div>
 
-                <!-- City dropdown, price range … (unchanged) -->
+                <label class="form-label fw-bold">Property types</label>
+                @foreach (var f in Model.PropertyTypes)
+                {
+                    var id = $"prop_{f.Value}";
+                    <div class="form-check">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               id="@id"
+                               name="SelectedPropertyTypes[]"
+                               value="@f.Value"
+                               @(Model.SelectedPropertyTypes.Contains(int.Parse(f.Value)) ? "checked" : "") />
+                        <label class="form-check-label" for="@id">
+                            @f.Text
+                        </label>
+                    </div>
+                }
+
+                <!-- Construction Types -->
+                <label class="form-label fw-bold">Construction types</label>
+                @foreach (var f in Model.ConstructionTypes)
+                {
+                    var id = $"cons_{f.Value}";
+                    <div class="form-check">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               id="@id"
+                               name="SelectedConstructionTypes[]"
+                               value="@f.Value"
+                               @(Model.SelectedConstructionTypes.Contains(int.Parse(f.Value)) ? "checked" : "") />
+                        <label class="form-check-label" for="@id">
+                            @f.Text
+                        </label>
+                    </div>
+                }
+
+                <!-- Features -->
+                <label class="form-label fw-bold">Features</label>
+                @foreach (var f in Model.AvailableFeatures)
+                {
+                    var id = $"feat_{f.Value}";
+                    <div class="form-check">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               id="@id"
+                               name="SelectedFeatures[]"
+                               value="@f.Value"
+                               @(Model.SelectedFeatures.Contains(int.Parse(f.Value)) ? "checked" : "") />
+                        <label class="form-check-label" for="@id">
+                            @f.Text
+                        </label>
+                    </div>
+                }
+
+                <!-- Price & Area -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="MinPrice" class="form-label">Min Price</label>
+                        <input asp-for="MinPrice" class="form-control form-control-sm" type="number" min="0" step="0.01" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="MaxPrice" class="form-label">Max Price</label>
+                        <input asp-for="MaxPrice" class="form-control form-control-sm" type="number" min="0" step="0.01" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="MinAreaM2" class="form-label">Min Area (m²)</label>
+                        <input asp-for="MinAreaM2" class="form-control form-control-sm" type="number" min="0" step="0.01" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="MaxAreaM2" class="form-label">Max Area (m²)</label>
+                        <input asp-for="MaxAreaM2" class="form-control form-control-sm" type="number" min="0" step="0.01" />
+                    </div>
+                </div>
+
+                <!-- Location & Floor -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="CityId" class="form-label">City / Town / Village</label>
+                        <select asp-for="CityId" asp-items="@Model.Cities"
+                                class="form-select" required>
+                            <option value="">— select city / town / village —</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="Floor" class="form-label">Floor</label>
+                        <input asp-for="Floor" class="form-control form-control-sm" />
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="FloorsTotal" class="form-label">Floors (if multi)</label>
+                        <input asp-for="FloorsTotal" class="form-control form-control-sm" />
+                    </div>
+                </div>
+
+                <!-- Has Pictures -->
+                <div class="form-check mb-3">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           asp-for="HasPictures"
+                           id="hasPictures" />
+                    <label class="form-check-label" for="hasPictures">
+                        Only show listings with pictures
+                    </label>
+                </div>
 
                 <button class="btn btn-primary w-100">Search</button>
             </form>
+
         </aside>
 
         <!-- right results -->
